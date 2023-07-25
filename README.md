@@ -87,7 +87,7 @@ dairy_recipes_2 = [<br/>
     ('atomic', 'time', 10000),<br/>
 ]<br/>
 
-In this case, calling lowest_cost(dairy_recipes_2, 'cow') should return None. Calling lowest_cost(dairy_recipes_2, 'milk') should also return None because in this case 'milk' cannot be made without 'cow'. If we went further and also removed 'cutting-edge laboratory', then lowest_cost would return None if we tried to calculate the cost of 'cheese', since there is no way to make it using the remaining atomic items.
+In this case, calling lowest_cost(dairy_recipes_2, 'cow') returns None. Calling lowest_cost(dairy_recipes_2, 'milk') also returns None because in this case 'milk' cannot be made without 'cow'. If we went further and also removed 'cutting-edge laboratory', then lowest_cost would return None if we tried to calculate the cost of 'cheese', since there is no way to make it using the remaining atomic items.
 
 2) Forbidden Items: sometimes when preparing food, we want to avoid using certain ingredients, even if they are technically available. For example, consider making food for someone with a dietary restriction; they may ask you not to include a particular food item even if it is available from the store. Ensure that there is an optional parameter to the lowest_cost function, so that we can optionally provide an iterable of food item names to ignore. Now, calling lowest_cost(dairy_recipes_2, 'cheese', ["cutting-edge laboratory"]) provides the same results as if we removed 'cutting-edge laboratory' from the database, but lowest_cost(dairy_recipes_2, 'cheese') works as before.<br/>
 <br/>
@@ -132,6 +132,130 @@ In this case, calling lowest_cost(dairy_recipes_2, 'cow') should return None. Ca
                  min_cost = min(result)
      
          return min_cost
+<br/>
+<p align="left">
+Finding the CHEAPEST FLAT recipe:<br/>
+Now, we can figure out how much money to take to the grocery store, taking into account their stock and things like dietary restrictions or foods that you or your friends don't like. But this only tells us how much money we need to take to the store; it doesn't actually tell us what to buy. <br/>
+
+Unlike 'lowest_cost', given  a recipes list and the name of a food item, this function returns a "flat recipe", representing the cheapest full recipe for the given food item. "flat recipe" is a dictionary mapping the necessary atomic food items to their quantities. Importantly, a flat recipe dictionary only contain atomic food items, and it contains the right number to build the original food item completely (possibly by creating other intermediate food items along the way).If the same minimal cost could be achieved by multiple different recipes, it returns any of those recipes.<br/>
+
+For example, let's return to our dairy_recipes example from earlier. Calling cheapest_flat_recipe(dairy_recipes, 'cheese') returns:<br/>
+
+{'cow': 2, 'milking stool': 1, 'time': 1}<br/>
+
+Calling cheapest_flat_recipe(dairy_recipes, 'cheese', ['cow']) returns:<br/>
+{'cutting-edge laboratory': 11}<br/>
+
+HELPER FUNCTIONS:<br/>
+1. scale_recipe: takes a flat_recipe dictionary and returns a new flat_recipe with all values scaled by n, wihtout mutating the input.<br/>
+       scaled_flat_recipe = {}
+   
+       for item in flat_recipe:
+           scaled_flat_recipe[item] = flat_recipe[item] * n
+   
+       return scaled_flat_recipe
+<br/>
+2. make_grocery_list: takes a list of flat_recipes and returns a new flat_recipe dictionary which includes all the keys mapped to the sum of the corresponding values across all the dictionaries, without mutating the input. For example, make_grocery_list([{'milk':1, 'chocolate':1}, {'sugar':1, 'milk':2}]) returns {'milk':3, 'chocolate': 1, 'sugar': 1}. <br/>
+
+       grocery_list = {}
+   
+       for flat in flat_recipes:
+           for item in flat:
+               if item not in grocery_list:
+                   grocery_list[item] = flat[item]
+               else:
+                   grocery_list[item] += flat[item]
+   
+       return grocery_list
+
+<br/>
+
+   
+
+
+def make_grocery_list(flat_recipes):
+    """
+    Given a list of flat_recipe dictionaries that map food items to quantities,
+    return a new overall 'grocery list' dictionary that maps each ingredient name
+    to the sum of its quantities across the given flat recipes.
+
+
+    """
+   
+
+def flat_recipe_cost(recipes, flat_recipe):
+    """
+    Returns cost of items in flat_recipe
+    """
+    sum_cost = []
+    for item in flat_recipe:
+        cost = flat_recipe[item] * make_atomic_costs(recipes)[item]
+        sum_cost.append(cost)
+
+    return sum(sum_cost)
+
+
+def cheapest_flat_recipe(recipes, food_item, forbidden=[]):
+    """
+    Given a recipes list and the name of a food item, return a dictionary
+    (mapping atomic food items to quantities) representing the cheapest full
+    recipe for the given food item.
+
+    Returns None if there is no possible recipe.
+    """
+    recipe_book =  make_recipe_book(recipes)
+    atomic_costs = make_atomic_costs(recipes)
+
+    flat_recipe_dict = {}
+
+    if food_item not in recipe_book and food_item not in atomic_costs:
+        return None
+
+    elif food_item in forbidden:  # check if atomic item in forbidden list (base case)
+        return None
+
+    elif food_item in atomic_costs:
+        flat_recipe_dict[food_item] = 1  # base case quantity is 1
+        return flat_recipe_dict
+
+    else:
+        result = []
+
+        for variant in recipe_book[food_item]:
+            ingredients = []
+
+            for item in variant:
+                flat_item_recipe = cheapest_flat_recipe(
+                    recipes, item[0], forbidden
+                )  # cheapest flat recipe of each item
+                if flat_item_recipe is not None:
+                    scaled_flat_item_recipe = scale_recipe(
+                        flat_item_recipe, item[1]
+                    )  # scale it by quantity
+                    ingredients.append(scaled_flat_item_recipe)
+                else:
+                    ingredients.append("None")
+            if "None" in ingredients:  # ignore
+                continue
+            else:
+                grocery_list = make_grocery_list(
+                    ingredients
+                )  # make grocery list of all dicts
+                result.append(grocery_list)  # list of grocery_list of diff variants
+
+    if not result:  # all variants don't work
+        return None
+
+    else:
+        min_recipe = ["None", float("inf")]
+
+        for recipe in result:
+            recipe_cost = flat_recipe_cost(recipes, recipe)  # cost
+            if recipe_cost < min_recipe[1]:
+                min_recipe = [recipe, recipe_cost]
+
+        return min_recipe[0]
+
 
 
 
