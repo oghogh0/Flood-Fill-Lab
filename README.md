@@ -234,16 +234,24 @@ HELPER FUNCTIONS:<br/>
    
        return sum(sum_cost)
 <br/>
+<p align="left">
+All FLAT recipes:<br/>
+In some cases, we may want to consider other ways of creating that food item as well. In this final section, I have written some functions that can help us find all of the ways we could create a given food item. This function produces a list of dictionaries representing each possible flat recipe that can be constructed from the given recipe list. The list returned may contain the appropriate elements in any order and duplicates.<br/>
+ 
+For example, there are several different ways to make a 'burger', depending on which way we choose to make the burger, how we make the cheese, and whether we choose the fancy ketchup:<br/>
+-{'yeast': 2, 'salt': 2, 'flour': 4, 'cutting-edge laboratory': 22, 'lettuce': 1, 'cow': 2}:<br/>
+-{'yeast': 2, 'salt': 2, 'flour': 4, 'cow': 4, 'milking stool': 2, 'time': 2, 'lettuce': 1}:<br/>
+-{'yeast': 2, 'salt': 2, 'flour': 4, 'cutting-edge laboratory': 11, 'lettuce': 1, 'cow': 1, 'tomato': 30, 'vinegar': 5}:<br/>
+-{'yeast': 2, 'salt': 3, 'flour': 4, 'cutting-edge laboratory': 11, 'lettuce': 1, 'cow': 1, 'tomato': 30, 'vinegar': 3, 'sugar': 2, 'cinnamon': 1}:<br/>
+-{'yeast': 2, 'salt': 2, 'flour': 4, 'cow': 2, 'milking stool': 1, 'time': 1, 'lettuce': 1, 'tomato': 30, 'vinegar': 5}:<br/>
+-{'yeast': 2, 'salt': 3, 'flour': 4, 'cow': 2, 'milking stool': 1, 'time': 1, 'lettuce': 1, 'tomato': 30, 'vinegar': 3, 'sugar': 2, 'cinnamon': 1}:<br/>
 
-def cheapest_flat_recipe(recipes, food_item, forbidden=[]):
-    """
-    Given a recipes list and the name of a food item, return a dictionary
-    (mapping atomic food items to quantities) representing the cheapest full
-    recipe for the given food item.
+Without 'milk', we end up with a smaller list of possibilities::<br/>
+-{'yeast': 2, 'salt': 3, 'flour': 4, 'cutting-edge laboratory': 11, 'lettuce': 1, 'cow': 1, 'tomato': 30, 'vinegar': 3, 'sugar': 2, 'cinnamon': 1}:<br/>
+-{'yeast': 2, 'salt': 2, 'flour': 4, 'cutting-edge laboratory': 11, 'lettuce': 1, 'cow': 1, 'tomato': 30, 'vinegar': 5}:<br/>
+-{'yeast': 2, 'salt': 2, 'flour': 4, 'cutting-edge laboratory': 22, 'lettuce': 1, 'cow': 2}:<br/>
 
-    Returns None if there is no possible recipe.
-    """
-    
+
 
 
 
