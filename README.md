@@ -89,7 +89,9 @@ dairy_recipes_2 = [<br/>
 
 In this case, calling lowest_cost(dairy_recipes_2, 'cow') should return None. Calling lowest_cost(dairy_recipes_2, 'milk') should also return None because in this case 'milk' cannot be made without 'cow'. If we went further and also removed 'cutting-edge laboratory', then lowest_cost would return None if we tried to calculate the cost of 'cheese', since there is no way to make it using the remaining atomic items.
 
-2) Forbidden Items: sometimes when preparing food, we want to avoid using certain ingredients, even if they are technically available. For example, consider making food for someone with a dietary restriction; they may ask you not to include a particular food item even if it is available from the store. Ensure that there is an optional parameter to the lowest_cost function, so that we can optionally provide an iterable of food item names to ignore. Now, calling lowest_cost(dairy_recipes_2, 'cheese', ["cutting-edge laboratory"]) provides the same results as if we removed 'cutting-edge laboratory' from the database, but lowest_cost(dairy_recipes_2, 'cheese') works as before.
+2) Forbidden Items: sometimes when preparing food, we want to avoid using certain ingredients, even if they are technically available. For example, consider making food for someone with a dietary restriction; they may ask you not to include a particular food item even if it is available from the store. Ensure that there is an optional parameter to the lowest_cost function, so that we can optionally provide an iterable of food item names to ignore. Now, calling lowest_cost(dairy_recipes_2, 'cheese', ["cutting-edge laboratory"]) provides the same results as if we removed 'cutting-edge laboratory' from the database, but lowest_cost(dairy_recipes_2, 'cheese') works as before.<br/>
+<br/>
+<br/>
 
          recipe_book =  make_recipe_book(recipes)
          atomic_costs = make_atomic_costs(recipes)
