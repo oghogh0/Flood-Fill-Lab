@@ -146,14 +146,70 @@ For example, let's return to our dairy_recipes example from earlier. Calling che
 Calling cheapest_flat_recipe(dairy_recipes, 'cheese', ['cow']) returns:<br/>
 {'cutting-edge laboratory': 11}<br/>
 
+The code is as follows:<br/>
+
+          recipe_book =  make_recipe_book(recipes)
+          atomic_costs = make_atomic_costs(recipes)
+      
+          flat_recipe_dict = {}
+      
+          if food_item not in recipe_book and food_item not in atomic_costs:
+              return None
+      
+          elif food_item in forbidden:  # check if atomic item in forbidden list (base case)
+              return None
+      
+          elif food_item in atomic_costs:
+              flat_recipe_dict[food_item] = 1  # base case quantity is 1
+              return flat_recipe_dict
+      
+          else:
+              result = []
+      
+              for variant in recipe_book[food_item]:
+                  ingredients = []
+      
+                  for item in variant:
+                      flat_item_recipe = cheapest_flat_recipe(
+                          recipes, item[0], forbidden
+                      )  # cheapest flat recipe of each item
+                      if flat_item_recipe is not None:
+                          scaled_flat_item_recipe = scale_recipe(
+                              flat_item_recipe, item[1]
+                          )  # scale it by quantity
+                          ingredients.append(scaled_flat_item_recipe)
+                      else:
+                          ingredients.append("None")
+                  if "None" in ingredients:  # ignore
+                      continue
+                  else:
+                      grocery_list = make_grocery_list(
+                          ingredients
+                      )  # make grocery list of all dicts
+                      result.append(grocery_list)  # list of grocery_list of diff variants
+      
+          if not result:  # all variants don't work
+              return None
+      
+          else:
+              min_recipe = ["None", float("inf")]
+      
+              for recipe in result:
+                  recipe_cost = flat_recipe_cost(recipes, recipe)  # cost
+                  if recipe_cost < min_recipe[1]:
+                      min_recipe = [recipe, recipe_cost]
+      
+              return min_recipe[0]
+<br/>
 HELPER FUNCTIONS:<br/>
 1. scale_recipe: takes a flat_recipe dictionary and returns a new flat_recipe with all values scaled by n, wihtout mutating the input.<br/>
-       scaled_flat_recipe = {}
-   
-       for item in flat_recipe:
-           scaled_flat_recipe[item] = flat_recipe[item] * n
-   
-       return scaled_flat_recipe
+
+        scaled_flat_recipe = {}
+    
+        for item in flat_recipe:
+            scaled_flat_recipe[item] = flat_recipe[item] * n
+    
+        return scaled_flat_recipe
 <br/>
 2. make_grocery_list: takes a list of flat_recipes and returns a new flat_recipe dictionary which includes all the keys mapped to the sum of the corresponding values across all the dictionaries, without mutating the input. For example, make_grocery_list([{'milk':1, 'chocolate':1}, {'sugar':1, 'milk':2}]) returns {'milk':3, 'chocolate': 1, 'sugar': 1}. <br/>
 
@@ -169,31 +225,15 @@ HELPER FUNCTIONS:<br/>
        return grocery_list
 
 <br/>
+3. flat_recipe_cost: returns cost of items in flat_recipe.
 
+       sum_cost = []
+       for item in flat_recipe:
+           cost = flat_recipe[item] * make_atomic_costs(recipes)[item]
+           sum_cost.append(cost)
    
-
-
-def make_grocery_list(flat_recipes):
-    """
-    Given a list of flat_recipe dictionaries that map food items to quantities,
-    return a new overall 'grocery list' dictionary that maps each ingredient name
-    to the sum of its quantities across the given flat recipes.
-
-
-    """
-   
-
-def flat_recipe_cost(recipes, flat_recipe):
-    """
-    Returns cost of items in flat_recipe
-    """
-    sum_cost = []
-    for item in flat_recipe:
-        cost = flat_recipe[item] * make_atomic_costs(recipes)[item]
-        sum_cost.append(cost)
-
-    return sum(sum_cost)
-
+       return sum(sum_cost)
+<br/>
 
 def cheapest_flat_recipe(recipes, food_item, forbidden=[]):
     """
@@ -203,59 +243,7 @@ def cheapest_flat_recipe(recipes, food_item, forbidden=[]):
 
     Returns None if there is no possible recipe.
     """
-    recipe_book =  make_recipe_book(recipes)
-    atomic_costs = make_atomic_costs(recipes)
-
-    flat_recipe_dict = {}
-
-    if food_item not in recipe_book and food_item not in atomic_costs:
-        return None
-
-    elif food_item in forbidden:  # check if atomic item in forbidden list (base case)
-        return None
-
-    elif food_item in atomic_costs:
-        flat_recipe_dict[food_item] = 1  # base case quantity is 1
-        return flat_recipe_dict
-
-    else:
-        result = []
-
-        for variant in recipe_book[food_item]:
-            ingredients = []
-
-            for item in variant:
-                flat_item_recipe = cheapest_flat_recipe(
-                    recipes, item[0], forbidden
-                )  # cheapest flat recipe of each item
-                if flat_item_recipe is not None:
-                    scaled_flat_item_recipe = scale_recipe(
-                        flat_item_recipe, item[1]
-                    )  # scale it by quantity
-                    ingredients.append(scaled_flat_item_recipe)
-                else:
-                    ingredients.append("None")
-            if "None" in ingredients:  # ignore
-                continue
-            else:
-                grocery_list = make_grocery_list(
-                    ingredients
-                )  # make grocery list of all dicts
-                result.append(grocery_list)  # list of grocery_list of diff variants
-
-    if not result:  # all variants don't work
-        return None
-
-    else:
-        min_recipe = ["None", float("inf")]
-
-        for recipe in result:
-            recipe_cost = flat_recipe_cost(recipes, recipe)  # cost
-            if recipe_cost < min_recipe[1]:
-                min_recipe = [recipe, recipe_cost]
-
-        return min_recipe[0]
-
+    
 
 
 
