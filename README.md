@@ -251,6 +251,63 @@ Without 'milk', we end up with a smaller list of possibilities::<br/>
 -{'yeast': 2, 'salt': 2, 'flour': 4, 'cutting-edge laboratory': 11, 'lettuce': 1, 'cow': 1, 'tomato': 30, 'vinegar': 5}:<br/>
 -{'yeast': 2, 'salt': 2, 'flour': 4, 'cutting-edge laboratory': 22, 'lettuce': 1, 'cow': 2}:<br/>
 
+The code is as follows:<br/>
+    
+        recipe_book = make_recipe_book(recipes)
+        atomic_costs = make_atomic_costs(recipes)
+    
+        if food_item not in recipe_book and food_item not in atomic_costs:
+            return []
+    
+        elif food_item in forbidden:  # check if atomic item in forbidden list (base case)
+            return []
+    
+        elif food_item in atomic_costs:
+            return [{food_item: 1}]
+    
+        else:
+            flat_recipe_list = []
+    
+            for variant in recipe_book[food_item]:  # each variant
+                all_scaled_flat_list = []  # particular to each recipe
+    
+                for item, quantity in variant:
+                    flat_item = all_flat_recipes(recipes, item, forbidden)
+    
+                    scaled_flat_list = []
+    
+                    for flat_dict in flat_item: #if forbidden, flat_item = []
+                        scaled_flat_item = scale_recipe(
+                            flat_dict, quantity)  # scale each dict
+                        scaled_flat_list.append(scaled_flat_item)
+                    
+                    all_scaled_flat_list.append(scaled_flat_list)
+
+            
+            ingredient_mixture = ingredient_mixes(all_scaled_flat_list)
+            flat_recipe_list.extend(ingredient_mixture)
+
+        return flat_recipe_list
+
+HELPER FUNCTION:<br/>
+-ingredient_mixes: given a list of lists of dictionaries, where each inner list represents all the flat recipes make a certain ingredient as part of a recipe, this function computes all combinations of the flat recipes.<br/>
+      
+          if len(flat_recipes) == 1:
+              return flat_recipes[0]
+      
+          else:
+              mix_list = []
+              mixture = ingredient_mixes(flat_recipes[1:])  # other flat recipes
+      
+              for flat_recipe in flat_recipes[0]:
+                  flat_copy = flat_recipe.copy()  # list of dict
+      
+                  for mix in mixture:
+                      new_recipe = make_grocery_list(
+                          [flat_copy, mix])  # helps find total e.g. pb twice (no update bc mutates)
+                      mix_list.append(new_recipe)
+      
+          return mix_list
 
 
 
